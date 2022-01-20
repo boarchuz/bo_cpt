@@ -1,0 +1,32 @@
+menu "[BO] C Partition Table"
+
+    config BO_CPT_DIR_DO_NOT_USE_CMAKE_VAR
+        bool "Do not use PARTITION_CSV_PATH"
+        default n
+        help
+            The IDF partition table component defines CMake variable 'PARTITION_CSV_PATH', however this is unavailable at the bootloader build stage.
+            If CPT is required for your custom bootloader, enable this option to allow locating the partition table by a different method.
+
+    choice BO_CPT_DIR
+        prompt "Project Path"
+        depends on BO_CPT_DIR_DO_NOT_USE_CMAKE_VAR && PARTITION_TABLE_CUSTOM
+        default BO_CPT_DIR_IN_COMPONENTS
+        help
+            Let CPT know where the project root is in order to determine the path to the partition table.
+            Normally, CPT will be in [project_root]/components (or bootloader_components).
+            If necessary, you can specify the path to the project root.
+
+        config BO_CPT_DIR_IN_COMPONENTS
+            bool "Component is in [project_root]/components"
+        config BO_CPT_DIR_RELATIVE_PROJECT_PATH
+            bool "Set relative path to project root"
+        config BO_CPT_DIR_ABSOLUTE_PROJECT_PATH
+            bool "Set absolute path to project root"
+
+    endchoice
+
+    config BO_CPT_PROJECT_PATH
+        string "Path to project root"
+        depends on BO_CPT_DIR_RELATIVE_PROJECT_PATH || BO_CPT_DIR_ABSOLUTE_PROJECT_PATH
+
+endmenu
